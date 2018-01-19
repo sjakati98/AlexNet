@@ -30,7 +30,7 @@ def fc_layer(bottom, weights, biases, batch_norm=False, flatten=False, dropout=0
         fully_connected = tf.matmul(fully_connected, weights)
         fully_connected = tf.layers.batch_normalization(fully_connected)
     else:
-        fully_connected = tf.nn.bias_add(tf.matmul(fully_connected, weights]), biases)
+        fully_connected = tf.nn.bias_add(tf.matmul(fully_connected, weights), biases)
     
     activated = tf.nn.relu(fully_connected)
     activated = tf.nn.dropout(fully_connected, keep_prob=dropout)
