@@ -29,7 +29,6 @@ def one_hot_image_arrays():
             image_array[CLASSES.index(class_[0].text)] = 1
     
         image_arrays.append(image_array)
-        print(image_array)
     
     
     return image_arrays
