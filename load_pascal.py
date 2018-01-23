@@ -2,11 +2,7 @@ import os
 import xml.etree.ElementTree as ET
 
 import numpy as np
-
-
-ROOT_DIR = '/Volumes/Shishir128/Datasets/VOCdevkit/VOC2012/'
-IMG_DIR = os.path.join(ROOT_DIR, 'JPEGImages')
-ANN_DIR = os.path.join(ROOT_DIR, 'Annotations')
+import tensorflow as tf
 
 CLASSES = [
     'person',
@@ -14,10 +10,15 @@ CLASSES = [
     'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
     'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor']
 
-def one_hot_image_arrays():
+def one_hot_image_arrays(ROOT_DIR='/Volumes/Shishir128/Datasets/VOCdevkit/VOC2012/'):
+
+    ## takes in a path to the directory in which VOC is held
+    IMG_DIR = os.path.join(ROOT_DIR, 'JPEGImages')
+    ANN_DIR = os.path.join(ROOT_DIR, 'Annotations')
     image_arrays = []
     ## every image annotation file
     for filename in os.listdir(ANN_DIR):
+        ## skip hidden files
         if filename.startswith('.'): continue
         ## parse xml to extract the classes in the image
         image_array = np.zeros(len(CLASSES), dtype=int)
@@ -27,11 +28,21 @@ def one_hot_image_arrays():
         ## get objects in tree
         for class_ in tree.getroot().iter('object'):
             image_array[CLASSES.index(class_[0].text)] = 1
-    
-        image_arrays.append(image_array)
+
+        ## turn filename into corresponding jpeg name
+        filename_jpeg = filename.replace('xml', 'jpeg')
+        filename_jpeg = os.path.join(IMG_DIR, filename_jpeg)
+        image_arrays.append([filename_jpeg, image_array])
     
     
     return image_arrays
 
 
+def load_images(images):
+    label = images[1]
+    image = tf.read_file(images[0])
+    image = tf.image.decode_jpeg(image, channels=3)
+    return image, label
+
+    
 
