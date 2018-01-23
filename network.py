@@ -5,8 +5,8 @@ import tensorflow as tf
 
 def alex_net(X, num_classes=10, dropout=0.4, batch_norm=False):
 
-    weights = get_weights()
-    biases = get_biases()
+    weights = get_weights(num_classes)
+    biases = get_biases(num_classes)
 
     ## reshape input to be used with network
     X = tf.reshape(X, shape=[-1, 224, 224, 3])
