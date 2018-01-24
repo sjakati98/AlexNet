@@ -80,10 +80,14 @@ with tf.Session() as sess:
        iter_ = 0
        while (iter_ * batch_size) < 16000:
            batch_x, batch_y = sess.run([train_image_batch, train_label_batch])
-           sess.run(optimizer, feed_dict={x: batch_x, y:batch_y, dropout_prob:0.5})
+           sess.run(optimizer, feed_dict={X: batch_x, y:batch_y, dropout_prob:0.5})
            iter_ += 1
     
         print("Epoch complete!")
     
     print("DEBUG: Training Complete")
-    
+
+    ## testing
+    test_x, test_y = sess.run([test_image_batch, test_label_batch])
+    accuracy = sess.run(optimizer, feed_dict={X: test_x, y:test_y, dropout_prob:1})
+    print("Accuracy:", accuracy)
