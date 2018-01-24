@@ -47,6 +47,10 @@ print("DEBUG: Images loaded")
 X_train, y_train = image[:16000], label[:16000]
 X_test, y_test = image[16000:], label[16000:]
 
+train_image_batch, train_label_batch = tf.train.batch([X_train, y_train], batch_size=batch_size)
+test_image_batch, test_label_batch = tf.train.batch([X_test, y_test], batch_size=batch_size)
+
+
 
 ## create network placeholders
 X = tf.placeholder(tf.float32, [-1, 224, 224, 3])
@@ -73,4 +77,13 @@ with tf.Session() as sess:
    ## batch training
    for epoch in epochs:
        ## iterate over training examples in specified batch size
-        for ## TODO: finish batch training
+       iter_ = 0
+       while (iter_ * batch_size) < 16000:
+           batch_x, batch_y = sess.run([train_image_batch, train_label_batch])
+           sess.run(optimizer, feed_dict={x: batch_x, y:batch_y, dropout_prob:0.5})
+           iter_ += 1
+    
+        print("Epoch complete!")
+    
+    print("DEBUG: Training Complete")
+    
