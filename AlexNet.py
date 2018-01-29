@@ -2,7 +2,7 @@ import os
 import sys
 
 from network import alex_net
-from load_pascal import one_hot_image_arrays, load_images
+from load_pascal import one_hot_image_arrays, load_images, image_to_tensor
 import tensorflow as tf
 import numpy as np
 
@@ -26,35 +26,20 @@ input_data = one_hot_image_arrays(ROOT_DIR='/Volumes/Shishir128/Datasets/VOCdevk
 images_list = np.array([x[0] for x in input_data])
 labels_list = np.array([x[1] for x in input_data])
 
-print("DEGUB: Images list size:", images_list.shape)
-print("DEGUB: Labels list size:", labels_list.shape)
 
-## convert lists to tensors
-images = tf.convert_to_tensor(images_list, tf.string)
+images = image_to_tensor(tf.convert_to_tensor(images_list, tf.string))
 labels = tf.convert_to_tensor(labels_list, tf.float32)
-print("DEBUG: Lists converted to tensors")
 
 
-image_queue = tf.train.slice_input_producer([images, labels], shuffle=True)
-image, label = load_images(image_queue) # fix the path joiner for tensors
-print("DEBUG: Images loaded")
 
-## TODO: 1. Split images and labels into training and testing sets
-##       2. Build network with placeholders
-##       3. Train network
-##       4. Test network
+X_train, y_train = images[:16000], labels[:16000]
+X_test, y_test = images[16000:], labels[16000:]
 
-X_train, y_train = image[:16000], label[:16000]
-X_test, y_test = image[16000:], label[16000:]
-
-train_image_batch, train_label_batch = tf.train.batch([X_train, y_train], batch_size=batch_size)
-test_image_batch, test_label_batch = tf.train.batch([X_test, y_test], batch_size=batch_size)
-
-
+print("DEBUG:", X_train.shape)
 
 ## create network placeholders
-X = tf.placeholder(tf.float32, [-1, 224, 224, 3])
-y = tf.placeholder(tf.float32, [-1, num_classes])
+X = tf.placeholder(tf.float32, [None, 227, 227, 3])
+y = tf.placeholder(tf.float32, [None, num_classes])
 dropout_prob = tf.placeholder(tf.float32)
 
 ## create the model
@@ -74,14 +59,28 @@ accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
+    print(X_train.shape)
+    train_image_batch, train_label_batch = tf.train.batch([X_train, y_train], batch_size=batch_size)
+    test_image_batch, test_label_batch = tf.train.batch([X_test, y_test], batch_size=batch_size)
+
    ## batch training
-   for epoch in epochs:
+    for epoch in epochs:
        ## iterate over training examples in specified batch size
-       iter_ = 0
-       while (iter_ * batch_size) < 16000:
-           batch_x, batch_y = sess.run([train_image_batch, train_label_batch])
-           sess.run(optimizer, feed_dict={X: batch_x, y:batch_y, dropout_prob:0.5})
-           iter_ += 1
+        iter_ = 0
+        while (iter_ * batch_size) < 16000:
+            batch_x, batch_y = sess.run([train_image_batch, train_label_batch])
+            sess.run(optimizer, feed_dict={
+               X: batch_x,
+               y:batch_y,
+               dropout_prob:0.5
+            })
+            los, acc = sess.run([loss, accuracy], feed_dict={
+                X: batch_x,
+                y: batch_y,
+                dropout_prob: 1
+            })
+            print("Minibatch loss:", los, "Minibatch accuracy:", acc)
+            iter_ += 1
     
         print("Epoch complete!")
     

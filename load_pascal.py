@@ -46,3 +46,11 @@ def load_images(images):
 
     
 
+def image_to_tensor(image_list):
+    filename_queue = tf.train.string_input_producer(image_list)
+    image_reader = tf.WholeFileReader()
+    key, image_contents = image_reader.read(filename_queue)
+    images = tf.image.decode_jpeg(image_contents, channels=3)
+    print("DEBUG:", images.shape)
+    float_images = tf.cast(images, tf.float32)
+    return float_images

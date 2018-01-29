@@ -9,7 +9,7 @@ def alex_net(X, num_classes=10, dropout=0.4, batch_norm=False):
     biases = get_biases(num_classes)
 
     ## reshape input to be used with network
-    X = tf.reshape(X, shape=[-1, 224, 224, 3])
+    X = tf.reshape(X, shape=[-1, 227, 227, 3])
     
     ## model build
     conv1 = conv2d_layer(X, weights['conv1_weights'], biases['conv1_biases'], strides=4, batch_norm=batch_norm)
@@ -18,9 +18,9 @@ def alex_net(X, num_classes=10, dropout=0.4, batch_norm=False):
     pool2 = max_pool_layer(conv2, kernel_size=3, strides=2, padding='SAME')
     conv3 = conv2d_layer(pool2, weights['conv3_weights'], biases['conv3_biases'], strides=1, batch_norm=batch_norm)
     pool3 = max_pool_layer(conv3, kernel_size=3, strides=2, padding='SAME')
-    conv4 = conv2d_layer(pool3, weights['conv3_weights'], biases['conv3_biases'], strides=1, batch_norm=batch_norm)
+    conv4 = conv2d_layer(pool3, weights['conv4_weights'], biases['conv4_biases'], strides=1, batch_norm=batch_norm)
     pool4 = max_pool_layer(conv4, kernel_size=3, strides=2, padding='SAME')
-    conv5 = conv2d_layer(pool4, weights['conv3_weights'], biases['conv3_biases'], strides=1, batch_norm=batch_norm)
+    conv5 = conv2d_layer(pool4, weights['conv5_weights'], biases['conv5_biases'], strides=1, batch_norm=batch_norm)
     pool5 = max_pool_layer(conv5, kernel_size=3, strides=2, padding='SAME')
 
     fc1 = fc_layer(pool5, weights['fully_connected1_weights'], biases['fully_connected1_biases'], batch_norm=batch_norm, flatten=True)
